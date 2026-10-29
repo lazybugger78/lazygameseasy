@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lazygames78 – play free games</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>😴</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f1ff; --surface:#ffffff; --ink:#26214a; --muted:#6d678f; --line:#ddd7f5;
+  --accent:#ff8a5c; --accent-ink:#2b1408; --mint:#6fdcbc;
+  --shadow:0 4px 0 rgba(38,33,74,.12);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#171433; --surface:#221e48; --ink:#f0edff; --muted:#a49fcf; --line:#352f6b; --shadow:0 4px 0 rgba(0,0,0,.35);}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Fredoka",system-ui,"Segoe UI",Arial,sans-serif;font-size:17px;line-height:1.4}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:2px solid var(--line)}
+.bar{max-width:1280px;margin:0 auto;padding:12px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.logo{font-weight:700;font-size:28px;letter-spacing:-.02em;text-decoration:none;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.logo span{display:inline-block;transform:rotate(-8deg);font-size:30px}
+.logo b{color:var(--accent)}
+.search{flex:1;min-width:200px;position:relative}
+.search input{width:100%;font:inherit;padding:12px 18px 12px 46px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
+.search input::placeholder{color:var(--muted)}
+.search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:2.5;stroke-linecap:round}
+.btn{font:inherit;font-weight:600;border:0;border-radius:999px;padding:11px 20px;cursor:pointer;background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow)}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.alt{background:var(--surface);color:var(--ink);border:2px solid var(--line)}
+main{max-width:1280px;margin:0 auto;padding:22px 20px 60px}
+.meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;color:var(--muted)}
+.meta h1{margin:0;font-size:24px;color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px}
+.card{display:block;text-decoration:none;background:var(--surface);border:2px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);transition:transform .12s}
+.card:hover{transform:translateY(-4px) rotate(-1deg)}
+.thumb{aspect-ratio:1/1;display:grid;place-items:center;font-size:56px;font-weight:700;color:rgba(255,255,255,.95);background-size:cover;background-position:center;text-shadow:0 3px 0 rgba(0,0,0,.18)}
+.card h2{margin:0;padding:10px 12px 12px;font-size:16px;font-weight:600;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.empty{text-align:center;padding:70px 10px;color:var(--muted);font-size:20px}
+.empty b{display:block;font-size:56px}
+/* player */
+#player{display:none;max-width:1280px;margin:0 auto;padding:16px 20px 40px}
+body.playing #player{display:block}
+body.playing #browse{display:none}
+.ptop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.ptop h1{margin:0;font-size:24px;flex:1;min-width:120px}
+.frame{width:100%;height:calc(100vh - 170px);min-height:420px;border:3px solid var(--line);border-radius:20px;overflow:hidden;background:#000}
+.frame iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+footer{text-align:center;color:var(--muted);padding:24px;font-size:15px}
+@media(max-width:560px){.grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}.thumb{font-size:44px}.logo{font-size:24px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <a class="logo" href="#" id="home"><span>😴</span>lazy<b>games</b>78</a>
+    <label class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Search games" autocomplete="off" aria-label="Search games">
+    </label>
+    <button class="btn" id="rand" type="button">Random game</button>
+  </div>
+</header>
+
+<main id="browse">
+  <div class="meta"><h1 id="title">All games</h1><span id="count"></span></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden><b>💤</b>No games match that. Try a shorter word.</div>
+</main>
+
+<section id="player">
+  <div class="ptop">
+    <button class="btn alt" id="back" type="button">‹ All games</button>
+    <h1 id="ptitle"></h1>
+    <button class="btn" id="full" type="button">Fullscreen</button>
+  </div>
+  <div class="frame"><iframe id="frame" title="Game" allow="fullscreen; autoplay; gamepad; clipboard-write"></iframe></div>
+</section>
+
+<footer>lazygames78 · no ads, no sign-up, just play</footer>
+
+<script src="games.js"></script>
+<script>
+(function(){
+  var games = window.GAMES || [];
+  var grid = document.getElementById('grid'), q = document.getElementById('q');
+  var empty = document.getElementById('empty'), count = document.getElementById('count');
+  var title = document.getElementById('title'), frame = document.getElementById('frame');
+
+  function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+  games.forEach(function(g){ g.slug = slug(g.name); });
+
+  function hue(s){ var h=0; for(var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))%360; return h; }
+  function initials(n){
+    var w = n.split(/\s+/).filter(Boolean);
+    return (w.length>1 ? w[0][0]+w[1][0] : n.slice(0,2)).toUpperCase();
+  }
+
+  function render(list){
+    grid.textContent = '';
+    var frag = document.createDocumentFragment();
+    list.forEach(function(g){
+      var a = document.createElement('a');
+      a.className = 'card'; a.href = '#play/' + g.slug;
+      var t = document.createElement('div'); t.className = 'thumb';
+      if (g.img){ t.style.backgroundImage = 'url("' + g.img + '")'; }
+      else { var h = hue(g.name); t.style.background = 'linear-gradient(135deg,hsl('+h+',70%,58%),hsl('+((h+50)%360)+',70%,48%))'; t.textContent = initials(g.name); }
+      var h2 = document.createElement('h2'); h2.textContent = g.name; h2.title = g.name;
+      a.appendChild(t); a.appendChild(h2); frag.appendChild(a);
+    });
+    grid.appendChild(frag);
+    empty.hidden = list.length > 0;
+    count.textContent = list.length + (list.length === 1 ? ' game' : ' games');
+  }
+
+  function filter(){
+    var term = q.value.trim().toLowerCase();
+    var list = !term ? games : games.filter(function(g){ return g.name.toLowerCase().indexOf(term) > -1; });
+    title.textContent = term ? 'Results for “' + q.value.trim() + '”' : 'All games';
+    render(list);
+  }
+  q.addEventListener('input', filter);
+
+  function route(){
+    var m = location.hash.match(/^#play\/(.+)$/);
+    var g = m && games.filter(function(x){ return x.slug === m[1]; })[0];
+    if (g){
+      document.body.classList.add('playing');
+      document.getElementById('ptitle').textContent = g.name;
+      document.title = g.name + ' – lazygames78';
+      if (frame.getAttribute('data-slug') !== g.slug){ frame.src = g.url; frame.setAttribute('data-slug', g.slug); }
+      window.scrollTo(0,0);
+    } else {
+      document.body.classList.remove('playing');
+      document.title = 'lazygames78 – play free games';
+      frame.removeAttribute('src'); frame.removeAttribute('data-slug');
+    }
+  }
+  window.addEventListener('hashchange', route);
+
+  document.getElementById('back').onclick = function(){ location.hash = ''; };
+  document.getElementById('home').onclick = function(e){ e.preventDefault(); q.value=''; filter(); location.hash=''; };
+  document.getElementById('rand').onclick = function(){
+    if (games.length) location.hash = '#play/' + games[Math.floor(Math.random()*games.length)].slug;
+  };
+  document.getElementById('full').onclick = function(){
+    var el = frame.parentNode; (el.requestFullscreen || el.webkitRequestFullscreen || function(){}).call(el);
+  };
+
+  if (!games.length){
+    empty.hidden = false;
+    empty.innerHTML = '<b>🛋️</b>No games yet. Put your files in the games folder, then run generate.py.';
+  } else { filter(); }
+  route();
+})();
+</script>
+</body>
+</html>
